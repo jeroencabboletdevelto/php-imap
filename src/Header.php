@@ -204,7 +204,7 @@ class Header {
         $this->extractAddresses($header);
 
         if (property_exists($header, 'subject')) {
-            $this->set("subject", $this->decode($header->subject));
+            $this->set("subject", $header->subject);
         }
         if (property_exists($header, 'references')) {
             $this->set("references", $this->decode($header->references));
