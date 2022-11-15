@@ -463,7 +463,7 @@ class Header {
                 $value = \imap_utf8($value);
                 $is_utf8_base = $this->is_uft8($value);
                 if ($is_utf8_base) {
-                    $value = mb_decode_mimeheader($value);
+                    $value = imap_utf8($value);
                 }
                 if ($this->notDecoded($original_value, $value)) {
                     $decoded_value = $this->mime_header_decode($value);
