@@ -566,7 +566,7 @@ class Message {
             //     https://en.wikipedia.org/wiki/ASCII
             //
             // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
-            if (!in_array($encoding ,['ISO-8859-1' , 'ISO-8859-2' ,  'us-ascii'])) {
+            if (!in_array($encoding ,['ISO-8859-1' , 'windows-1251' , 'windows-1252' , 'ISO-8859-2' ,  'us-ascii'])) {
                 $content = $this->convertEncoding($content, $encoding);
             }
 
