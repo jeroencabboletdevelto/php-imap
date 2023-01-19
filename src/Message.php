@@ -217,7 +217,8 @@ class Message {
         $this->parseHeader();
 
         if ($this->getFetchBodyOption() === true) {
-            $this->parseBody();
+            // we don't need this for speed, it only "peeks" -> flag message as  "read"
+            // $this->parseBody();
         }
 
         if ($this->getFetchFlagsOption() === true && $this->fetch_options !== IMAP::FT_PEEK) {
@@ -555,28 +556,30 @@ class Message {
 
             $content = $this->decodeString($part->content, $part->encoding);
 
-            // We don't need to do convertEncoding() if charset is ASCII (us-ascii):
-            //     ASCII is a subset of UTF-8, so all ASCII files are already UTF-8 encoded
-            //     https://stackoverflow.com/a/11303410
-            //
-            // us-ascii is the same as ASCII:
-            //     ASCII is the traditional name for the encoding system; the Internet Assigned Numbers Authority (IANA)
-            //     prefers the updated name US-ASCII, which clarifies that this system was developed in the US and
-            //     based on the typographical symbols predominantly in use there.
-            //     https://en.wikipedia.org/wiki/ASCII
-            //
-            // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
-            if (!in_array($encoding ,['ISO-8859-1' , 'windows-1251' , 'windows-1252' , 'ISO-8859-2' ,  'us-ascii'])) {
-                $content = $this->convertEncoding($content, $encoding);
-            }
+            if ($content != '' ) {
+                // We don't need to do convertEncoding() if charset is ASCII (us-ascii):
+                //     ASCII is a subset of UTF-8, so all ASCII files are already UTF-8 encoded
+                //     https://stackoverflow.com/a/11303410
+                //
+                // us-ascii is the same as ASCII:
+                //     ASCII is the traditional name for the encoding system; the Internet Assigned Numbers Authority (IANA)
+                //     prefers the updated name US-ASCII, which clarifies that this system was developed in the US and
+                //     based on the typographical symbols predominantly in use there.
+                //     https://en.wikipedia.org/wiki/ASCII
+                //
+                // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
+                if (!in_array($encoding ,['ISO-8859-1' , 'windows-1251' , 'windows-1252' , 'ISO-8859-2' ,  'us-ascii'])) {
+                    $content = $this->convertEncoding($content, $encoding);
+                }
 
-            $subtype = strtolower($part->subtype ?? '');
-            $subtype = $subtype == "plain" || $subtype == "" ? "text" : $subtype;
+                $subtype = strtolower($part->subtype ?? '');
+                $subtype = $subtype == "plain" || $subtype == "" ? "text" : $subtype;
 
-            if (isset($this->bodies[$subtype])) {
-                $this->bodies[$subtype] .= "\n".$content;
-            }else{
-                $this->bodies[$subtype] = $content;
+                if (isset($this->bodies[$subtype])) {
+                    $this->bodies[$subtype] .= "\n".$content;
+                }else{
+                    $this->bodies[$subtype] = $content;
+                }
             }
         }
     }
@@ -820,11 +823,11 @@ class Message {
      */
     protected function fetchThreadByInReplyTo(MessageCollection &$thread, string $in_reply_to, Folder $primary_folder, Folder $secondary_folder, Folder $sent_folder){
         $primary_folder->query()->inReplyTo($in_reply_to)
-        ->setFetchBody($this->getFetchBodyOption())
-        ->leaveUnread()->get()->each(function($message) use(&$thread, $secondary_folder, $sent_folder){
-            /** @var Message $message */
-            $message->thread($sent_folder, $thread, $secondary_folder);
-        });
+            ->setFetchBody($this->getFetchBodyOption())
+            ->leaveUnread()->get()->each(function($message) use(&$thread, $secondary_folder, $sent_folder){
+                /** @var Message $message */
+                $message->thread($sent_folder, $thread, $secondary_folder);
+            });
     }
 
     /**
@@ -842,11 +845,11 @@ class Message {
      */
     protected function fetchThreadByMessageId(MessageCollection &$thread, string $message_id, Folder $primary_folder, Folder $secondary_folder, Folder $sent_folder){
         $primary_folder->query()->messageId($message_id)
-        ->setFetchBody($this->getFetchBodyOption())
-        ->leaveUnread()->get()->each(function($message) use(&$thread, $secondary_folder, $sent_folder){
-            /** @var Message $message */
-            $message->thread($sent_folder, $thread, $secondary_folder);
-        });
+            ->setFetchBody($this->getFetchBodyOption())
+            ->leaveUnread()->get()->each(function($message) use(&$thread, $secondary_folder, $sent_folder){
+                /** @var Message $message */
+                $message->thread($sent_folder, $thread, $secondary_folder);
+            });
     }
 
     /**
