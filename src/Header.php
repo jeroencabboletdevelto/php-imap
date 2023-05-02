@@ -101,14 +101,34 @@ class Header {
      *
      * @return Attribute
      */
-    public function get($name): Attribute {
-        $name = str_replace(["-", " "], "_", strtolower($name));
-        if (isset($this->attributes[$name])) {
-            return $this->attributes[$name];
+
+    public function get($name) {
+        if (in_array($name , ['name' , 'filename'])) {
+            $result = $this->attributes[$name] ?? null;
+            if (empty($result)) {
+                $counter = 0;
+                $result = '';
+                while ( isset($this->attributes[$name.'*'.$counter])) {
+                    $result .= $this->attributes[$name.'*'.$counter];
+                    $counter++;
+                }
+            }
+            if (!empty($result)) {
+                return $result;
+            } else {
+                return null;
+            }
+
+        } else {
+            if (isset($this->attributes[$name])) {
+                return $this->attributes[$name];
+            }
+
         }
 
         return new Attribute($name);
     }
+
 
     /**
      * Set a specific attribute
