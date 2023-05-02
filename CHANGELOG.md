@@ -15,6 +15,63 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - NaN
 
 
+## [5.0.0] - 2023-01-18
+### Fixed
+- The message uid and message number will only be fetched if accessed and wasn't previously set #326 #285 (thanks @szymekjanaczek)
+- Fix undefined attachment name when headers use "filename*=" format #301 (thanks @JulienChavee)
+- Fixed `ImapProtocol::logout` always throws 'not connected' Exception after upgraded to 4.1.2 #351
+- Protocol interface and methods unified
+- Strict attribute and return types introduced where ever possible
+- Parallel messages during idle #338
+- Idle timeout / stale resource stream issue fixed
+- Syntax updated to support php 8 features
+- Get the attachment file extension from the filename if no mimetype detection library is available
+- Prevent the structure parsing from parsing an empty part
+- Convert all header keys to their lower case representation
+- Restructure the decode function #355 (thanks @istid)
+
+### Added
+- Unit tests added #347 #242 (thanks @sergiy-petrov, @boekkooi-lengoo)
+- `Client::clone()` method added to clone a client instance
+- Save an entire message (including its headers) `Message::save()`
+- Restore a message from a local or remote file `Message::fromFile()`
+- Protocol resource stream accessor added `Protocol::getStream()`
+- Protocol resource stream meta data accessor added `Protocol::meta()`
+- ImapProtocol resource stream reset method added `ImapProtocol::reset()`
+- Protocol `Response::class` introduced to handle and unify all protocol requests
+- Static mask config accessor added `ClientManager::getMask()` added
+- An `Attribute::class`  instance can be treated as array
+- Get the current client account configuration via `Client::getConfig()`
+- Delete a folder via `Client::deleteFolder()`
+
+### Breaking changes
+- PHP ^8.0.2 required
+- `nesbot/carbon` version bumped to ^2.62.1
+- `phpunit/phpunit` version bumped to ^9.5.10
+- `Header::get()` always returns an `Attribute::class` instance
+- `Attribute::class` accessor methods renamed to shorten their names and improve the readability
+- All protocol methods that used to return `array|bool` will now always return a `Response::class` instance.
+- `ResponseException::class` gets thrown if a response is empty or contains errors
+- Message client is optional and can be null (e.g. if used in combination with `Message::fromFile()`)
+- The message text or html body is now "" if its empty and not `null`
+
+
+## [4.1.2] - 2022-12-14
+### Fixed
+- Attachment ID can return an empty value #318
+- Additional message date format added #345 (thanks @amorebietakoUdala)
+
+
+## [4.1.1] - 2022-11-16
+### Fixed
+- Fix for extension recognition #325 (thanks @pwoszczyk)
+- Missing null check added #327 (thanks @spanjeta)
+- Leading white-space in response causes an infinite loop #321 (thanks @thin-k-design)
+- Fix error when creating folders with special chars #319 (thanks @thin-k-design)
+- `Client::getFoldersWithStatus()` recursive loading fixed #312 (thanks @szymekjanaczek)
+- Fix Folder name encoding error in `Folder::appendMessage()` #306 #307 (thanks @rskrzypczak)
+
+
 ## [4.1.0] - 2022-10-18
 ### Fixed
 - Fix assumedNextTaggedLine bug #288 (thanks @Blear)
