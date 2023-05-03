@@ -134,7 +134,7 @@ class Header {
 
         }
 
-        return new Attribute($name);
+        return null;
     }
 
     /**
